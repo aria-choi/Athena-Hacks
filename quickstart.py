@@ -9,6 +9,8 @@ from oauth2client import tools
 from oauth2client.file import Storage
 
 import datetime
+from datetime import timedelta
+from tzlocal import get_localzone
 
 try:
     import argparse
@@ -20,7 +22,7 @@ except ImportError:
 # at ~/.credentials/calendar-python-quickstart.json
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 CLIENT_SECRET_FILE = 'client_secret.json'
-APPLICATION_NAME = 'Google Calendar API Python Quickstart'
+APPLICATION_NAME = 'Google Calendar Bullet Journal'
 
 
 def get_credentials():
@@ -54,17 +56,40 @@ def get_credentials():
 def main():
     """Shows basic usage of the Google Calendar API.
 
-    Creates a Google Calendar API service object and outputs a list of the next
-    10 events on the user's calendar.
+    Creates a Google Calendar API service object and outputs a list of the events in the next
+    X days on the user's calendar.
     """
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
 
+    """x = int(input('How many days would you like to view?'))
+
+    if x == 1:
+       print('You selected', x, 'day')
+    else:
+       print('You selected', x, 'days')"""
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-    print('Getting the upcoming 10 events')
+    DAY = timedelta(1)
+    endDay = now + str(DAY)
+
+    """now = datetime.datetime.utcnow().isoformat()
+    now = str(now)
+    s = datetime.datetime.strptime(now, '%Y-%m-%dT%H:%M:%S.%f')
+    s = s.strftime('%m/%d')
+    DAY = timedelta(1)
+    DAY = str(DAY)
+    e = datetime.datetime.strptime(DAY, '1 day, %H:%M:%S')
+    e = e.strftime('%m/%d')
+    endDay = s + e
+
+    if x == 1:
+       print('Getting your events for the next', x, 'day')
+    else:
+       print('Getting your events for the next', x, 'days')"""
+
     eventsResult = service.events().list(
-        calendarId='primary', timeMin=now, maxResults=10, singleEvents=True,
+        calendarId='primary', timeMin=now, timeMax='2017-4-20T00:00:00Z', singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items', [])
 
